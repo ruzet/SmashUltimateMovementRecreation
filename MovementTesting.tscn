@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://b5qqhkihip0t6"]
+
+[ext_resource type="Script" uid="uid://1lbc340y3sbs" path="res://Player.gd" id="1_5ace4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rq3qu"]
+size = Vector2(1013.5, 163)
+
+[node name="Stage" type="Node2D" unique_id=731334760]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=651840315]
+position = Vector2(960, 0)
+script = ExtResource("1_5ace4")
+
+[node name="Player" type="ColorRect" parent="CharacterBody2D" unique_id=1269708180]
+offset_right = 75.0
+offset_bottom = 75.0
+color = Color(0.09019608, 0.5921569, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=292008339]
+position = Vector2(37.5, 37)
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1907234050]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1448397113]
+position = Vector2(960.25, 854.5)
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="Ground" type="ColorRect" parent="StaticBody2D" unique_id=1622697052]
+offset_left = 452.5
+offset_top = 773.0
+offset_right = 1467.5
+offset_bottom = 936.0
