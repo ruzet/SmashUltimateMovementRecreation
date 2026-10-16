@@ -16,7 +16,7 @@ const Jumps = 2
 
 const DashTime = 0.4
 const DashDistance = 275
-const AirDodgeXVelocity = 500 #this is set every frame so make it lower when fine turning
+const AirDodgeXVelocity = 650 #this is set every frame so make it lower when fine turning
 const AirDodgeYVelocity = -700
 
 var XVelocity = 0
@@ -34,6 +34,7 @@ var AirDodging = false
 var JumpDebounce = false
 var ResetJumpDebounce = false
 var DodgeDebounce = false
+var IsJumping = false
 
 func ResetJumpDebounceFunction():
 	ResetJumpDebounce = true
@@ -101,6 +102,11 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	var Direction = Input.get_axis("ui_left", "ui_right")
+	if event.is_action_pressed("Jump"):
+		IsJumping = true
+	elif event.is_action_released("Jump"):
+		IsJumping = false
+
 	if event.is_action_pressed("Jump") && CurrentJumps != 0 && !JumpDebounce && !Dodging && !AirDodging:
 		if CurrentJumps == Jumps:
 			YVelocity = JumpPower
@@ -108,9 +114,9 @@ func _input(event: InputEvent) -> void:
 			YVelocity = DoubleJumpPower
 		CurrentJumps -= 1
 		JumpDebounce = true
-		await get_tree().create_timer(0.05).timeout
+		await get_tree().create_timer(0.2).timeout
 		JumpDebounce = false
-		if !OnGround && Input.get_axis("ui_down", "ui_up") != 1:
+		if !OnGround && IsJumping == false && YVelocity < ShortJumpPower:
 			YVelocity = ShortJumpPower
 	elif event.is_action_pressed("Dodge") && !DodgeDebounce:
 		if OnGround:
@@ -146,12 +152,13 @@ func _physics_process(delta: float) -> void:
 			elif !AirDodging:
 				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-Acceleration * delta)
 
-			if UnrotatedXVelocity > 0 && self.rotation < self.floor_max_angle:
-				YVelocity = (UnrotatedXVelocity * (get_floor_normal().x * Direction)) * SpeedMultiplier
-			else:
-				if !JumpDebounce:
-					if Direction == 0:
-						YVelocity = 0 + (YVelocity - 0) * exp(-Deceleration * delta)
+			if !JumpDebounce:
+				if Direction != 0 && self.rotation < self.floor_max_angle:
+					YVelocity = (UnrotatedXVelocity * (get_floor_normal().x * Direction)) * SpeedMultiplier
+				elif Direction == 0:
+					YVelocity = 0 + (YVelocity - 0) * exp(-Deceleration * delta)
+				else:
+					YVelocity = 0
 		else:
 			self.rotation_degrees = 0
 			TimeInAir += delta
