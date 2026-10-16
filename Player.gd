@@ -48,18 +48,30 @@ func _physics_process(delta: float) -> void:
 	OnGround = self.is_on_floor()
 
 	if OnGround == true:
-		self.rotation_degrees = get_floor_angle()
+		var TargetXVelocity = Direction * Speed
+		if get_floor_angle() < floor_max_angle: self.rotation = get_floor_angle()
 		TimeInAir = 0
 		if !ResetJumpDebounce:
 			CurrentJumps = Jumps
 			ResetJumpDebounceFunction()
-		
+
+		var UnrotatedXVelocity = TargetXVelocity
+		TargetXVelocity = UnrotatedXVelocity * -get_floor_normal().y
+		var SpeedMultiplier = (Direction * Speed) / TargetXVelocity
+		if TargetXVelocity == 0: SpeedMultiplier = 1
+		TargetXVelocity *= SpeedMultiplier
+
 		if Direction == 0:
 			XVelocity = 0 + (XVelocity - 0) * exp(-Deceleration * delta)
 		else:
-			var TargetXVelocity = Direction * Speed
 			XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-Acceleration * delta)
-		if !JumpDebounce: YVelocity = 0
+
+		if UnrotatedXVelocity > 0 && self.rotation < self.floor_max_angle:
+			YVelocity = (UnrotatedXVelocity * (get_floor_normal().x * Direction)) * SpeedMultiplier
+		else:
+			if !JumpDebounce:
+				if Direction == 0:
+					YVelocity = 0 + (YVelocity - 0) * exp(-Deceleration * delta)
 	else:
 		self.rotation_degrees = 0
 		TimeInAir += delta

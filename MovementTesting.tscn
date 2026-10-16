@@ -3,8 +3,9 @@
 [ext_resource type="Script" uid="uid://1lbc340y3sbs" path="res://Player.gd" id="1_5ace4"]
 [ext_resource type="Script" uid="uid://c1sp35ini3je6" path="res://Camera.gd" id="2_jm8ft"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_muyn6"]
-size = Vector2(49, 50)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jm8ft"]
+radius = 25.0
+height = 50.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rq3qu"]
 size = Vector2(1013.5, 163)
@@ -16,7 +17,7 @@ position = Vector2(935, 600)
 script = ExtResource("1_5ace4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1507815415]
-shape = SubResource("RectangleShape2D_muyn6")
+shape = SubResource("CapsuleShape2D_jm8ft")
 
 [node name="ColorRect" type="ColorRect" parent="Player" unique_id=1269708180]
 anchors_preset = 8
