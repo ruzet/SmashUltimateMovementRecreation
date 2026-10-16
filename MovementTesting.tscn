@@ -16,25 +16,60 @@ position = Vector2(935, 600)
 script = ExtResource("1_5ace4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1507815415]
-position = Vector2(24.5, 25)
 shape = SubResource("RectangleShape2D_muyn6")
 
 [node name="ColorRect" type="ColorRect" parent="Player" unique_id=1269708180]
-offset_right = 50.0
-offset_bottom = 50.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.09019608, 0.5921569, 1, 1)
 
 [node name="Stage" type="StaticBody2D" parent="." unique_id=1907234050]
+position = Vector2(960, 775)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Stage" unique_id=1448397113]
-position = Vector2(960.25, 854.5)
 shape = SubResource("RectangleShape2D_rq3qu")
 
 [node name="ColorRect" type="ColorRect" parent="Stage" unique_id=1622697052]
-offset_left = 452.5
-offset_top = 773.0
-offset_right = 1467.5
-offset_bottom = 936.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Slope" type="StaticBody2D" parent="." unique_id=1020423347]
+position = Vector2(600, 775)
+rotation = 0.5235988
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slope" unique_id=392083708]
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="ColorRect" type="ColorRect" parent="Slope" unique_id=1697466478]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1318962065]
 position = Vector2(960, 540)
