@@ -1,7 +1,7 @@
 78098b89c88a74ebe8c20117b8754620
-::res://::1792155085
+::res://::1792207568
 Camera.gd::GDScript::6635872447330356043::1792011663::0::1::::<>Camera2D<><>0<>0<><>::
 icon.svg::CompressedTexture2D::3942217206269644716::1791833773::1791835423::1::::<><><>0<>0<>c5e0d7fe8f030d929f5c541f5cd8ea85<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-MovementTesting.tscn::PackedScene::4526100547261921249::1792133163::0::1::::<><><>0<>0<><>::uid://1lbc340y3sbs::::res://Player.gd<>uid://c1sp35ini3je6::::res://Camera.gd
-Player.gd::GDScript::1847683895086286908::1792133608::0::1::::<>CharacterBody2D<><>0<>0<><>::
+MovementTesting.tscn::PackedScene::4526100547261921249::1792180040::0::1::::<><><>0<>0<><>::uid://1lbc340y3sbs::::res://Player.gd<>uid://c1sp35ini3je6::::res://Camera.gd
+Player.gd::GDScript::1847683895086286908::1792189027::0::1::::<>CharacterBody2D<><>0<>0<><>::
 README.md::TextFile::-1::1791835239::0::1::::<><><>0<>0<><>::

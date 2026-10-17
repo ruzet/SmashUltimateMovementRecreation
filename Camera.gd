@@ -1,6 +1,6 @@
 extends Camera2D
 
-const FollowSpeed = 3
+const FollowSpeed = 4
 
 func _ready() -> void:
 	pass
