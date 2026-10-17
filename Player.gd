@@ -14,15 +14,23 @@ const FastFallingSpeed = 800
 const Gravity = 1750
 const Jumps = 2
 
-const KBScale = 1.0
-const KBLaunchScale = 0.03 * 60.0 * 3.0 * KBScale
-const KBDecayPerSecond = 0.051 * 3600.0 * 4.0 * KBScale
-const KBHitstunGravity = Gravity * KBScale
-
 const DashTime = 0.5
 const DashDistance = 300
 const AirDodgeXVelocity = 650 #this is set every frame so make it lower when fine turning
 const AirDodgeYVelocity = -700
+
+@export var OverallSpeedMultiplier = 1
+@export var OverallJumpMultiplier = 1
+@export var OverallFallingSpeedMultiplier = 1
+@export var OverallGravityMultiplier = 1
+@export var OverallAirDodgeMultiplier = 1
+@export var OverallKnockbackMultiplier = 1
+@export var OverallHitstunMultiplier = 1
+@export var OverallHitlagMultiplier = 1
+
+var KBLaunchScale = 0.03 * 60.0 * 3.0
+var KBDecayPerSecond = 0.051 * 3600.0 * 4.0
+var KBHitstunGravity = Gravity * 0.8
 
 var XVelocity = 0
 var YVelocity = 0
@@ -79,6 +87,11 @@ func ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, Mu
 func Attack(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier, HitlagMultiplier):
 	ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier)
 	ProcessHitlag(Damage, HitlagMultiplier)
+
+func UpdateValues():
+	KBLaunchScale = 0.03 * 60.0 * 3.0 * OverallKnockbackMultiplier
+	KBDecayPerSecond = 0.051 * 3600.0 * 4.0 * OverallKnockbackMultiplier
+	KBHitstunGravity = Gravity * OverallGravityMultiplier * 0.8 * OverallKnockbackMultiplier
 
 func Dash(ParamDashDirection):
 	DashFloorNormal = get_floor_normal()
@@ -144,15 +157,15 @@ func _input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("Jump") && CurrentJumps != 0 && !JumpDebounce && !Dodging && !AirDodging:
 		if CurrentJumps == Jumps:
-			YVelocity = JumpPower
+			YVelocity = JumpPower * OverallJumpMultiplier
 		else:
-			YVelocity = DoubleJumpPower
+			YVelocity = DoubleJumpPower * OverallJumpMultiplier
 		CurrentJumps -= 1
 		JumpDebounce = true
-		await get_tree().create_timer(0.2).timeout
+		await get_tree().create_timer(0.15).timeout
 		JumpDebounce = false
-		if !OnGround && IsJumping == false && YVelocity < ShortJumpPower:
-			YVelocity = ShortJumpPower
+		if !OnGround && IsJumping == false && YVelocity < ShortJumpPower * OverallJumpMultiplier:
+			YVelocity = ShortJumpPower * OverallJumpMultiplier
 	elif event.is_action_pressed("Dodge") && !DodgeDebounce:
 		if OnGround:
 			if Direction != 0: Dash(Direction)
@@ -202,7 +215,7 @@ func _physics_process(delta: float) -> void:
 				AirDodging = false
 				$"ColorRect".rotation_degrees = 0
 				$"ColorRect".color = Color.from_rgba8(23, 151, 255) 
-			var TargetXVelocity = Direction * Speed
+			var TargetXVelocity = Direction * Speed * OverallSpeedMultiplier
 			if get_floor_angle() < floor_max_angle: self.rotation = get_floor_angle()
 			TimeInAir = 0
 			if !ResetJumpDebounce:
@@ -211,7 +224,7 @@ func _physics_process(delta: float) -> void:
 
 			var UnrotatedXVelocity = TargetXVelocity
 			TargetXVelocity = UnrotatedXVelocity * -get_floor_normal().y
-			var SpeedMultiplier = (Direction * Speed) / TargetXVelocity
+			var SpeedMultiplier = (Direction * Speed * OverallSpeedMultiplier) / TargetXVelocity
 			if TargetXVelocity == 0: SpeedMultiplier = 1
 			TargetXVelocity *= SpeedMultiplier
 
@@ -234,15 +247,15 @@ func _physics_process(delta: float) -> void:
 			if Direction == 0 && !AirDodging:
 				XVelocity = 0 + (XVelocity - 0) * exp(-AirDeceleration * delta)
 			elif !AirDodging:
-				var TargetXVelocity = Direction * Speed
+				var TargetXVelocity = Direction * Speed * OverallSpeedMultiplier
 				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-AirAcceleration * delta)
 			if Input.get_axis("ui_down", "ui_up") == -1 && TimeInAir > 0.5 && !AirDodging:
-				YVelocity = FastFallingSpeed
+				YVelocity = (FastFallingSpeed * OverallFallingSpeedMultiplier)
 			else:
-				if YVelocity > FallingSpeed:
-					YVelocity = FallingSpeed
+				if YVelocity > FallingSpeed * OverallFallingSpeedMultiplier:
+					YVelocity = FallingSpeed * OverallFallingSpeedMultiplier
 				else:
-					YVelocity += Gravity * delta
+					YVelocity += Gravity * OverallGravityMultiplier * delta
 	elif Dodging && !Hitstun && !Hitlag:
 		var NextDashSpeed = max(DashSpeed - DashDecel * delta, 0)
 		var Result = Raycast()
@@ -261,7 +274,7 @@ func _physics_process(delta: float) -> void:
 		if OnGround and YVelocity > 0:
 			YVelocity = 0
 		else:
-			YVelocity = min(YVelocity + KBHitstunGravity * delta, FallingSpeed * KBScale)
+			YVelocity = min(YVelocity + KBHitstunGravity * delta, (FallingSpeed * OverallFallingSpeedMultiplier) * OverallKnockbackMultiplier)
 
 	var Decay = KBDecayPerSecond * delta
 	if KnockbackVelocity.length() > Decay:
