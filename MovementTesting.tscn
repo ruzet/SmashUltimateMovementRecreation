@@ -75,5 +75,5 @@ grow_vertical = 2
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1318962065]
 position = Vector2(960, 540)
-zoom = Vector2(2, 2)
+zoom = Vector2(1.5, 1.5)
 script = ExtResource("2_jm8ft")

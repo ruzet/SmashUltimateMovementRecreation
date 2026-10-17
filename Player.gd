@@ -33,6 +33,10 @@ var DashSpeed = 0
 var DashDecel = 0
 var DashDirection = 0
 var HitstunTimer = 0
+var HitlagTimer = 0
+var StartingHitlagTimer = 0
+var ShakeOffset = 0
+var ShakeDirection = 1
 var KnockbackVelocity = Vector2.ZERO
 var DashFloorNormal = Vector2.UP
 var DashTangent = Vector2.RIGHT
@@ -52,23 +56,29 @@ func ResetJumpDebounceFunction():
 	await get_tree().create_timer(0.05).timeout
 	ResetJumpDebounce = false
 
-func GetKnockbackUnits(Damage, CurrentPercent, Weight, KnockbackScaling, BaseKnockback, Multiplier):
-	return ((((((CurrentPercent / 10) + ((CurrentPercent * Damage) / 20)) * (200 / (Weight + 100)) * 1.4) + 18) * KnockbackScaling) + BaseKnockback) * Multiplier
+func ProcessHitlag(Damage, HitlagMultiplier):
+	var HitlagFrames = floor((Damage * 0.65 + 6) * HitlagMultiplier)
+	StartingHitlagTimer = HitlagFrames / 60
+	HitlagTimer = StartingHitlagTimer
+	Hitlag = true
 
-func Knockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, Multiplier):
+func ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, Multiplier):
 	Percent += Damage
-	var KB = GetKnockbackUnits(Damage, Percent, Weight, KnockbackScaling, BaseKnockback, Multiplier)
-
+	var KnockbackUnits = ((((((Percent / 10) + ((Percent * Damage) / 20)) * (200 / (Weight + 100)) * 1.4) + 18) * KnockbackScaling) + BaseKnockback) * Multiplier
 	Dodging = false
 	AirDodging = false
 	$"ColorRect".rotation_degrees = 0
 	$"ColorRect".color = Color.from_rgba8(236, 86, 140)
 	var Dir = Vector2(cos(deg_to_rad(Angle)), -sin(deg_to_rad(Angle)))
-	KnockbackVelocity = Dir * KB * KBLaunchScale
-	HitstunTimer = (floor(KB * 0.4) - 1) / 60.0
+	KnockbackVelocity = Dir * KnockbackUnits * KBLaunchScale
+	HitstunTimer = (floor(KnockbackUnits * 0.4) - 1) / 60.0
 	Hitstun = true
 	XVelocity = 0
 	YVelocity = 0
+
+func Attack(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier, HitlagMultiplier):
+	ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier)
+	ProcessHitlag(Damage, HitlagMultiplier)
 
 func Dash(ParamDashDirection):
 	DashFloorNormal = get_floor_normal()
@@ -149,17 +159,32 @@ func _input(event: InputEvent) -> void:
 		else:
 			AirDodge()
 	elif event.is_action_pressed("Knockback"):
-		Knockback(305, 10, 100, 1, 80, 1)
+		Attack(305, 10, 100, 1, 80, 1, 1)
 
 func _physics_process(delta: float) -> void:
 	var Direction = Input.get_axis("ui_left", "ui_right")
 	OnGround = self.is_on_floor()
 	if HitstunTimer > 0:
-		HitstunTimer -= delta
+		if !Hitlag:
+			$"ColorRect".rotation_degrees = 0
+			$"ColorRect".color = Color.from_rgba8(236, 86, 140)
+			HitstunTimer -= delta
 	else:
 		if $"ColorRect".color == Color.from_rgba8(236, 86, 140):
 			$"ColorRect".color = Color.from_rgba8(23, 151, 255)
+	if HitlagTimer > 0:
+		ShakeOffset = max(remap(HitlagTimer, StartingHitlagTimer * 0.4, StartingHitlagTimer, 0, 10), 0)
+		print(remap(HitlagTimer, StartingHitlagTimer * 0.2, StartingHitlagTimer, 0, 7))
+		$"ColorRect".color = Color.from_rgba8(23, 151, 255)
+		$"ColorRect".rotation_degrees = 30 * KnockbackVelocity.sign().x
+		$"ColorRect".position.x = ShakeOffset * ShakeDirection
+		ShakeDirection = -ShakeDirection
+		HitlagTimer -= delta
+	else:
+		$"ColorRect".position.x = 0
+
 	Hitstun = HitstunTimer > 0
+	Hitlag = HitlagTimer > 0
 
 	if WasHitstun && !Hitstun:
 		var Carry = Vector2(XVelocity, YVelocity) + KnockbackVelocity
@@ -171,7 +196,7 @@ func _physics_process(delta: float) -> void:
 		KnockbackVelocity = Vector2.ZERO
 	WasHitstun = Hitstun
 
-	if !Dodging && !Hitstun:
+	if !Dodging && !Hitstun && !Hitlag:
 		if OnGround == true:
 			if AirDodging:
 				AirDodging = false
@@ -218,7 +243,7 @@ func _physics_process(delta: float) -> void:
 					YVelocity = FallingSpeed
 				else:
 					YVelocity += Gravity * delta
-	elif Dodging && !Hitstun:
+	elif Dodging && !Hitstun && !Hitlag:
 		var NextDashSpeed = max(DashSpeed - DashDecel * delta, 0)
 		var Result = Raycast()
 
@@ -231,7 +256,7 @@ func _physics_process(delta: float) -> void:
 			XVelocity = DashVelocity.x
 			YVelocity = DashVelocity.y
 			DashSpeed = NextDashSpeed
-	elif Hitstun:
+	elif Hitstun && !Hitlag:
 		XVelocity = 0
 		if OnGround and YVelocity > 0:
 			YVelocity = 0
@@ -245,9 +270,7 @@ func _physics_process(delta: float) -> void:
 		KnockbackVelocity = Vector2.ZERO
 	
 	self.velocity = Vector2(XVelocity, YVelocity) + KnockbackVelocity
-	print(Hitstun)
-	print(KnockbackVelocity.length())
-	move_and_slide()
+	if!Hitlag: move_and_slide()
 
 	if Hitstun:
 		for Collision in get_slide_collision_count():
