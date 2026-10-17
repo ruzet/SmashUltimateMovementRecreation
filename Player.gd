@@ -14,8 +14,8 @@ const FastFallingSpeed = 800
 const Gravity = 1750
 const Jumps = 2
 
-const DashTime = 0.4
-const DashDistance = 275
+const DashTime = 0.5
+const DashDistance = 300
 const AirDodgeXVelocity = 650 #this is set every frame so make it lower when fine turning
 const AirDodgeYVelocity = -700
 
