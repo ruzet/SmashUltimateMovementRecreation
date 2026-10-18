@@ -22,7 +22,7 @@ const KnockbackSettings = {
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("MultiplierMenu"):
-		$"Panel".visible = $"Panel".visible
+		$"Panel".visible = !$"Panel".visible
 
 func _ready() -> void:
 	var Player = $"../Player"

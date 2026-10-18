@@ -49,6 +49,7 @@ var DashDecel = 0
 var DashDirection = 0
 var HitstunTimer = 0
 var HitlagTimer = 0
+var BouncelagTimer = 0
 var StartingHitlagTimer = 0
 var ShakeOffset = 0
 var ShakeDirection = 1
@@ -64,6 +65,7 @@ var DodgeDebounce = false
 var IsJumping = false
 var Hitlag = false
 var Hitstun = false
+var Bouncelag = false
 var WasHitstun = false
 
 func ResetJumpDebounceFunction():
@@ -196,14 +198,14 @@ func _input(event: InputEvent) -> void:
 		self.velocity = Vector2.ZERO
 		self.position = Vector2(935.0, 400)
 
-func _physics_process(delta: float) -> void:
+func _physics_process(Delta: float) -> void:
 	var Direction = Input.get_axis("ui_left", "ui_right")
 	OnGround = self.is_on_floor()
 	if HitstunTimer > 0:
 		if !Hitlag:
 			$"ColorRect".rotation_degrees = 0
 			$"ColorRect".color = Color.from_rgba8(236, 86, 140)
-			HitstunTimer -= delta
+			HitstunTimer -= Delta
 	else:
 		if $"ColorRect".color == Color.from_rgba8(236, 86, 140):
 			$"ColorRect".color = Color.from_rgba8(23, 151, 255)
@@ -213,12 +215,15 @@ func _physics_process(delta: float) -> void:
 		$"ColorRect".rotation_degrees = 30 * KnockbackVelocity.sign().x
 		$"ColorRect".position.x = ShakeOffset * ShakeDirection
 		ShakeDirection = -ShakeDirection
-		HitlagTimer -= delta
+		HitlagTimer -= Delta
 	else:
 		$"ColorRect".position.x = -25
+	if BouncelagTimer > 0:
+		BouncelagTimer -= Delta
 
 	Hitstun = HitstunTimer > 0
 	Hitlag = HitlagTimer > 0
+	Bouncelag = BouncelagTimer > 0
 
 	if WasHitstun && !Hitstun:
 		var Carry = Vector2(XVelocity, YVelocity) + KnockbackVelocity
@@ -250,35 +255,35 @@ func _physics_process(delta: float) -> void:
 			TargetXVelocity *= SpeedMultiplier
 
 			if Direction == 0 && !AirDodging:
-				XVelocity = 0 + (XVelocity - 0) * exp(-Deceleration * delta)
+				XVelocity = 0 + (XVelocity - 0) * exp(-Deceleration * Delta)
 			elif !AirDodging:
-				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-Acceleration * delta)
+				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-Acceleration * Delta)
 
 			if !JumpDebounce:
 				if Direction != 0 && self.rotation < self.floor_max_angle:
 					YVelocity = (UnrotatedXVelocity * (get_floor_normal().x * Direction)) * SpeedMultiplier
 				elif Direction == 0:
-					YVelocity = 0 + (YVelocity - 0) * exp(-Deceleration * delta)
+					YVelocity = 0 + (YVelocity - 0) * exp(-Deceleration * Delta)
 				else:
 					YVelocity = 0
 		else:
 			self.rotation_degrees = 0
-			TimeInAir += delta
+			TimeInAir += Delta
 			if CurrentJumps == Jumps: CurrentJumps -= 1
 			if Direction == 0 && !AirDodging:
-				XVelocity = 0 + (XVelocity - 0) * exp(-AirDeceleration * delta)
+				XVelocity = 0 + (XVelocity - 0) * exp(-AirDeceleration * Delta)
 			elif !AirDodging:
 				var TargetXVelocity = Direction * Speed * OverallSpeedMultiplier
-				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-AirAcceleration * delta)
+				XVelocity = TargetXVelocity + (XVelocity - TargetXVelocity) * exp(-AirAcceleration * Delta)
 			if Input.get_axis("ui_down", "ui_up") == -1 && TimeInAir > 0.5 && !AirDodging:
 				YVelocity = (FastFallingSpeed * OverallFallingSpeedMultiplier)
 			else:
 				if YVelocity > FallingSpeed * OverallFallingSpeedMultiplier:
 					YVelocity = FallingSpeed * OverallFallingSpeedMultiplier
 				else:
-					YVelocity += Gravity * OverallGravityMultiplier * delta
+					YVelocity += Gravity * OverallGravityMultiplier * Delta
 	elif Dodging && !Hitstun && !Hitlag:
-		var NextDashSpeed = max(DashSpeed - DashDecel * delta, 0)
+		var NextDashSpeed = max(DashSpeed - DashDecel * Delta, 0)
 		var Result = Raycast()
 
 		if Result == "Stop":
@@ -295,23 +300,23 @@ func _physics_process(delta: float) -> void:
 		if OnGround and YVelocity > 0:
 			YVelocity = 0
 		else:
-			YVelocity = min(YVelocity + KBHitstunGravity * delta, (FallingSpeed * OverallFallingSpeedMultiplier) * OverallKnockbackMultiplier)
+			YVelocity = min(YVelocity + KBHitstunGravity * Delta, (FallingSpeed * OverallFallingSpeedMultiplier) * OverallKnockbackMultiplier)
 
-	var Decay = KBDecayPerSecond * delta
+	var Decay = KBDecayPerSecond * Delta
 	if KnockbackVelocity.length() > Decay:
 		KnockbackVelocity -= KnockbackVelocity.normalized() * Decay
 	else:
 		KnockbackVelocity = Vector2.ZERO
 	
 	self.velocity = Vector2(XVelocity, YVelocity) + KnockbackVelocity
-	if!Hitlag: move_and_slide()
+	if !Hitlag && !Bouncelag: move_and_slide()
 
 	if Hitstun:
 		for Collision in get_slide_collision_count():
 			var Normal = get_slide_collision(Collision).get_normal()
 			if KnockbackVelocity.dot(Normal) < 0:
-				var IsFloor = Normal.y < -0.7
 				if KnockbackVelocity.length() > 300 && HitstunTimer > 0.1:
-					KnockbackVelocity = KnockbackVelocity.bounce(Normal) * (0.6 if IsFloor else 0.95)
+					KnockbackVelocity = KnockbackVelocity.bounce(Normal) * 0.95
+					if KnockbackVelocity.length() > 150: BouncelagTimer = 0.2
 				else:
 					KnockbackVelocity = KnockbackVelocity.slide(Normal)
