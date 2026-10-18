@@ -13,7 +13,7 @@ config_version=5
 config/name="Smash Ultimate Movement Recreation"
 run/main_scene="uid://b5qqhkihip0t6"
 config/features=PackedStringArray("4.7", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://bwfv0hc4cltce"
 
 [display]
 
@@ -56,3 +56,4 @@ MultiplierMenu={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+environment/defaults/default_clear_color=Color(0.1282638, 0.24253884, 0.42131513, 1)

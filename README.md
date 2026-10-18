@@ -1,8 +1,17 @@
-# Smash Ultimate Movement Recreation - A recreation of smash ultimate's movement system made in Godot!
-
+# Smash Ultimate Movement Recreation - A recreation of smash ultimate's movement system (+ knockback) made in Godot!
+## Made for Hack Club's Terra - [Try It here!](https://ruzet.itch.io/smash-ultimate-movement-recreation)
 ### Controls:
-Left/Right arrows to move
 
-Up arrow to jump (because there's no tilt attacks to use the up direction)
+Arrow Keys - Move
 
-Down arrow to fast fall/crouch
+Z - Jump
+
+X - Dodge (Air/Ground)
+
+C - Start Knockback Sequence
+
+R - Reset
+
+Tab - Open/Close Multiplier Menu
+
+
