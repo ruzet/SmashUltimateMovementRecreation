@@ -1,7 +1,14 @@
+Label
+LineEdit
+HBoxContainer
+VBoxContainer
+ScrollContainer
+CanvasLayer
+Panel
+Control
 Camera2D
 CollisionShape2D
 StaticBody2D
 CharacterBody2D
 ColorRect
 Sprite2D
-AnimatedSprite2D

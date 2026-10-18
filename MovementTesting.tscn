@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://b5qqhkihip0t6"]
 
 [ext_resource type="Script" uid="uid://1lbc340y3sbs" path="res://Player.gd" id="1_5ace4"]
+[ext_resource type="Script" uid="uid://dao55uu2fe1h3" path="res://GUI.gd" id="1_spa14"]
 [ext_resource type="Script" uid="uid://c1sp35ini3je6" path="res://Camera.gd" id="2_jm8ft"]
+[ext_resource type="Script" uid="uid://bigx1eb80ehlg" path="res://Percent.gd" id="2_niuwx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jm8ft"]
 radius = 25.0
@@ -12,8 +14,73 @@ size = Vector2(1013.5, 163)
 
 [node name="Stage" type="Node2D" unique_id=731334760]
 
+[node name="GUI" type="CanvasLayer" parent="." unique_id=487979732]
+script = ExtResource("1_spa14")
+
+[node name="Panel" type="Panel" parent="GUI" unique_id=357935652]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -940.0
+offset_top = -520.0
+offset_right = -520.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GUI/Panel" unique_id=513116641]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GUI/Panel/ScrollContainer" unique_id=591659071]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="GUI/Panel/ScrollContainer/VBoxContainer" unique_id=253732690]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Template" type="HBoxContainer" parent="GUI/Panel/ScrollContainer/VBoxContainer" unique_id=66890652]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="GUI/Panel/ScrollContainer/VBoxContainer/Template" unique_id=216722028]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="GUI/Panel/ScrollContainer/VBoxContainer/Template" unique_id=625618321]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 1
+theme_override_font_sizes/font_size = 25
+alignment = 1
+select_all_on_focus = true
+
+[node name="Label" type="Label" parent="GUI" unique_id=446171992]
+offset_left = 20.0
+offset_top = 1000.0
+offset_right = 134.0
+offset_bottom = 1069.0
+theme_override_font_sizes/font_size = 50
+text = "0.0%"
+script = ExtResource("2_niuwx")
+
 [node name="Player" type="CharacterBody2D" parent="." unique_id=651840315]
-position = Vector2(935, 600)
+position = Vector2(935, 400)
 script = ExtResource("1_5ace4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1507815415]
@@ -53,14 +120,94 @@ offset_bottom = 81.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Slope" type="StaticBody2D" parent="." unique_id=1020423347]
+[node name="Ceiling" type="StaticBody2D" parent="." unique_id=1781218040]
+position = Vector2(960, 0)
+scale = Vector2(1.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling" unique_id=1576219494]
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="ColorRect" type="ColorRect" parent="Ceiling" unique_id=417205620]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Slope1" type="StaticBody2D" parent="." unique_id=1020423347]
 position = Vector2(600, 775)
 rotation = 0.5235988
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Slope" unique_id=392083708]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slope1" unique_id=392083708]
 shape = SubResource("RectangleShape2D_rq3qu")
 
-[node name="ColorRect" type="ColorRect" parent="Slope" unique_id=1697466478]
+[node name="ColorRect" type="ColorRect" parent="Slope1" unique_id=1697466478]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Slope2" type="StaticBody2D" parent="." unique_id=1722211491]
+position = Vector2(1600, 600)
+rotation = -1.0471976
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slope2" unique_id=786840040]
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="ColorRect" type="ColorRect" parent="Slope2" unique_id=1953721147]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Wall1" type="StaticBody2D" parent="." unique_id=1619634704]
+position = Vector2(200, 400)
+rotation = 1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall1" unique_id=1682927854]
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="ColorRect" type="ColorRect" parent="Wall1" unique_id=2103750242]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -507.5
+offset_top = -81.5
+offset_right = 507.5
+offset_bottom = 81.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Wall2" type="StaticBody2D" parent="." unique_id=1664879231]
+position = Vector2(1700, 400)
+rotation = 1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2" unique_id=1302654913]
+shape = SubResource("RectangleShape2D_rq3qu")
+
+[node name="ColorRect" type="ColorRect" parent="Wall2" unique_id=1335797585]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

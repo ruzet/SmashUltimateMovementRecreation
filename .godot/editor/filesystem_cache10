@@ -1,7 +1,9 @@
 78098b89c88a74ebe8c20117b8754620
-::res://::1792246647
-Camera.gd::GDScript::6635872447330356043::1792211802::0::1::::<>Camera2D<><>0<>0<><>::
+::res://::1792343985
+Camera.gd::GDScript::6635872447330356043::1792307409::0::1::::<>Camera2D<><>0<>0<><>::
+GUI.gd::GDScript::7190039505832997698::1792307747::0::1::::<>CanvasLayer<><>0<>0<><>::
 icon.svg::CompressedTexture2D::3942217206269644716::1791833773::1791835423::1::::<><><>0<>0<>c5e0d7fe8f030d929f5c541f5cd8ea85<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-MovementTesting.tscn::PackedScene::4526100547261921249::1792215516::0::1::::<><><>0<>0<><>::uid://1lbc340y3sbs::::res://Player.gd<>uid://c1sp35ini3je6::::res://Camera.gd
-Player.gd::GDScript::1847683895086286908::1792217077::0::1::::<>CharacterBody2D<><>0<>0<><>::
+MovementTesting.tscn::PackedScene::4526100547261921249::1792307870::0::1::::<><><>0<>0<><>::uid://1lbc340y3sbs::::res://Player.gd<>uid://dao55uu2fe1h3::::res://GUI.gd<>uid://c1sp35ini3je6::::res://Camera.gd<>uid://bigx1eb80ehlg::::res://Percent.gd
+Percent.gd::GDScript::2961760833968022824::1792307832::0::1::::<>Label<><>0<>0<><>::
+Player.gd::GDScript::1847683895086286908::1792307794::0::1::::<>CharacterBody2D<><>0<>0<><>::
 README.md::TextFile::-1::1791835239::0::1::::<><><>0<>0<><>::

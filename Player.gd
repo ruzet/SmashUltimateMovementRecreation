@@ -28,6 +28,14 @@ const AirDodgeYVelocity = -700
 @export var OverallHitstunMultiplier = 1
 @export var OverallHitlagMultiplier = 1
 
+@export var Angle = 45
+@export var Damage = 8
+@export var Weight = 100
+@export var KnockbackScaling = 1
+@export var BaseKnockback = 80
+@export var UnitMultiplier = 1
+@export var Percent = 0.0
+
 var KBLaunchScale = 0.03 * 60.0 * 3.0
 var KBDecayPerSecond = 0.051 * 3600.0 * 4.0
 var KBHitstunGravity = Gravity * 0.8
@@ -35,7 +43,6 @@ var KBHitstunGravity = Gravity * 0.8
 var XVelocity = 0
 var YVelocity = 0
 var CurrentJumps = 2
-var Percent = 50
 var TimeInAir = 0
 var DashSpeed = 0
 var DashDecel = 0
@@ -64,15 +71,14 @@ func ResetJumpDebounceFunction():
 	await get_tree().create_timer(0.05).timeout
 	ResetJumpDebounce = false
 
-func ProcessHitlag(Damage, HitlagMultiplier):
-	var HitlagFrames = floor((Damage * 0.65 + 6) * HitlagMultiplier)
+func ProcessHitlag():
+	var HitlagFrames = floor((Damage * 0.65 + 6) * OverallHitlagMultiplier)
 	StartingHitlagTimer = HitlagFrames / 60
 	HitlagTimer = StartingHitlagTimer
 	Hitlag = true
 
-func ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, Multiplier):
-	Percent += Damage
-	var KnockbackUnits = ((((((Percent / 10) + ((Percent * Damage) / 20)) * (200 / (Weight + 100)) * 1.4) + 18) * KnockbackScaling) + BaseKnockback) * Multiplier
+func ProcessKnockback():
+	var KnockbackUnits = ((((((Percent / 10.0) + ((Percent * Damage) / 20.0)) * (200.0 / (Weight + 100)) * 1.4) + 18) * KnockbackScaling) + BaseKnockback) * UnitMultiplier
 	Dodging = false
 	AirDodging = false
 	$"ColorRect".rotation_degrees = 0
@@ -84,9 +90,10 @@ func ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, Mu
 	XVelocity = 0
 	YVelocity = 0
 
-func Attack(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier, HitlagMultiplier):
-	ProcessKnockback(Angle, Damage, Weight, KnockbackScaling, BaseKnockback, KnockbackMultiplier)
-	ProcessHitlag(Damage, HitlagMultiplier)
+func Attack():
+	Percent += Damage
+	ProcessKnockback()
+	ProcessHitlag()
 
 func UpdateValues():
 	KBLaunchScale = 0.03 * 60.0 * 3.0 * OverallKnockbackMultiplier
@@ -110,8 +117,8 @@ func AirDodge():
 	AirDodging = true
 	$"ColorRect".color = Color.from_rgba8(115, 184, 255)
 	$"ColorRect".rotation_degrees = 45
-	if VectorDirection.x != 0: XVelocity = AirDodgeXVelocity * VectorDirection.x
-	if VectorDirection.y != 0: YVelocity = AirDodgeYVelocity * VectorDirection.y
+	if VectorDirection.x != 0: XVelocity = AirDodgeXVelocity * OverallAirDodgeMultiplier * VectorDirection.x
+	if VectorDirection.y != 0: YVelocity = AirDodgeYVelocity * OverallAirDodgeMultiplier * VectorDirection.y
 	await get_tree().create_timer(0.5).timeout
 	$"ColorRect".rotation_degrees = 0
 	$"ColorRect".color = Color.from_rgba8(23, 151, 255) 
@@ -149,6 +156,7 @@ func Raycast():
 		return
 
 func _input(event: InputEvent) -> void:
+	UpdateValues()
 	var Direction = Input.get_axis("ui_left", "ui_right")
 	if event.is_action_pressed("Jump"):
 		IsJumping = true
@@ -172,7 +180,21 @@ func _input(event: InputEvent) -> void:
 		else:
 			AirDodge()
 	elif event.is_action_pressed("Knockback"):
-		Attack(305, 10, 100, 1, 80, 1, 1)
+		Attack()
+	elif event.is_action_pressed("Reset"):
+		KnockbackVelocity = Vector2.ZERO
+		DashFloorNormal = Vector2.UP
+		DashTangent = Vector2.RIGHT
+		Percent = 0
+		XVelocity = 0
+		YVelocity = 0
+		HitlagTimer = 0
+		HitstunTimer = 0
+		Hitlag = false
+		Hitstun = false
+		AirDodging = false
+		self.velocity = Vector2.ZERO
+		self.position = Vector2(935.0, 400)
 
 func _physics_process(delta: float) -> void:
 	var Direction = Input.get_axis("ui_left", "ui_right")
@@ -187,14 +209,13 @@ func _physics_process(delta: float) -> void:
 			$"ColorRect".color = Color.from_rgba8(23, 151, 255)
 	if HitlagTimer > 0:
 		ShakeOffset = max(remap(HitlagTimer, StartingHitlagTimer * 0.4, StartingHitlagTimer, 0, 10), 0)
-		print(remap(HitlagTimer, StartingHitlagTimer * 0.2, StartingHitlagTimer, 0, 7))
 		$"ColorRect".color = Color.from_rgba8(23, 151, 255)
 		$"ColorRect".rotation_degrees = 30 * KnockbackVelocity.sign().x
 		$"ColorRect".position.x = ShakeOffset * ShakeDirection
 		ShakeDirection = -ShakeDirection
 		HitlagTimer -= delta
 	else:
-		$"ColorRect".position.x = 0
+		$"ColorRect".position.x = -25
 
 	Hitstun = HitstunTimer > 0
 	Hitlag = HitlagTimer > 0
